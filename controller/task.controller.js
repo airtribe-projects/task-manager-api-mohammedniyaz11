@@ -8,14 +8,17 @@ const filePath = path.join(__dirname, "../task.json");
 const getTasks = (req, res) => {
     try {
         const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-        let resposnse = data.tasks || [];
-        if(req.query.completed){
-            resposnse=data.tasks.filter((e)=>e.completed===Boolean(req.query.completed))
+        let response = data.tasks || [];
+
+        if (req.query.completed === "true" || req.query.completed === "false") {
+            const completed = req.query.completed === "true";
+            response = response.filter(task => task.completed === completed);
         }
+
         return res.status(200).json({
             success: true,
-            count: resposnse.length,
-            data: resposnse
+            count: response.length,
+            data: response
         });
     } catch (error) {
         console.log(error)
@@ -33,11 +36,11 @@ const getTaskById = (req, res) => {
         const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
         const tasks = data.tasks || [];
         const task = tasks.find((ele) => ele.id == id);
-        if(!task){
+        if (!task) {
             return res.status(404).json({
-            success: false,
-            message: "no task found"
-        });
+                success: false,
+                message: "no task found"
+            });
 
 
         }
