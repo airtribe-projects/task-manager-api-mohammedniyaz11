@@ -1,17 +1,24 @@
 const tasks = require("../task.json");
 const path = require("path")
-const fs = require("fs")
+const fs = require("fs");
+const e = require("express");
 
 const filePath = path.join(__dirname, "../task.json");
 
 const getTasks = (req, res) => {
     try {
+        const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+        let resposnse = data.tasks || [];
+        if(req.query.completed){
+            resposnse=data.tasks.filter((e)=>e.completed===Boolean(req.query.completed))
+        }
         return res.status(200).json({
             success: true,
-            count: tasks.length,
-            data: tasks
+            count: resposnse.length,
+            data: resposnse
         });
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: "Error while getting tasks"
@@ -142,8 +149,6 @@ const deleteTask = (req, res) => {
                 message: "Task not found"
             });
         }
-
-        // Remove task
         const deletedTask = tasks.splice(taskIndex, 1)[0];
 
         // Save back
