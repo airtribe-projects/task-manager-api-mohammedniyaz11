@@ -19,7 +19,7 @@ const getTasks = (req, res) => {
         });
     } catch (error) {
         console.log(error)
-        return res.status(500).json({
+        return res.status(400).json({
             success: false,
             message: "Error while getting tasks"
         });
@@ -29,11 +29,18 @@ const getTasks = (req, res) => {
 const getTaskById = (req, res) => {
     try {
         const { id } = req.params;
-
         // Read file and parse JSON
         const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
         const tasks = data.tasks || [];
         const task = tasks.find((ele) => ele.id == id);
+        if(!task){
+            return res.status(404).json({
+            success: false,
+            message: "no task found"
+        });
+
+
+        }
         return res.status(200).json({
             success: true,
             count: 1,
